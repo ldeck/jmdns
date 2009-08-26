@@ -253,10 +253,15 @@ public class JmDNSImpl extends JmDNS
         // I would pass' JmDNS.Timer'.
         timer = new Timer();
         new RecordReaper(this).start(timer);
+
+        // (ldeck 2.1.1) preventing shutdown blocking thread
+        // -------------------------------------------------
         shutdown = new Thread(new Shutdown(), "JmDNS.Shutdown");
         Runtime.getRuntime().addShutdownHook(shutdown);
 
         incomingListener = new Thread(new SocketListener(this), "JmDNS.SocketListener");
+        incomingListener.setDaemon(true);
+        // -------------------------------------------------
 
         // Bind to multicast socket
         openMulticastSocket(getLocalHost());
