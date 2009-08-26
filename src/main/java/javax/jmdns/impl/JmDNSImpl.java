@@ -256,8 +256,8 @@ public class JmDNSImpl extends JmDNS
 
         // (ldeck 2.1.1) preventing shutdown blocking thread
         // -------------------------------------------------
-        shutdown = new Thread(new Shutdown(), "JmDNS.Shutdown");
-        Runtime.getRuntime().addShutdownHook(shutdown);
+        shutdown = null;// new Thread(new Shutdown(), "JmDNS.Shutdown");
+        //Runtime.getRuntime().addShutdownHook(shutdown);
 
         incomingListener = new Thread(new SocketListener(this), "JmDNS.SocketListener");
         incomingListener.setDaemon(true);
