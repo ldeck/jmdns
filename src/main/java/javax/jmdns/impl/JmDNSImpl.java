@@ -251,7 +251,7 @@ public class JmDNSImpl extends JmDNS
 
         // REMIND: If I could pass in a name for the Timer thread,
         // I would pass' JmDNS.Timer'.
-        timer = new Timer();
+        timer = new Timer("JmDNS.Timer");
         new RecordReaper(this).start(timer);
 
         // (ldeck 2.1.1) preventing shutdown blocking thread
