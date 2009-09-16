@@ -122,6 +122,22 @@ public class JmDNSImpl extends JmDNS
      * Last throttle increment.
      */
     private long lastThrottleIncrement;
+    
+    //
+    // 2009-09-16 ldeck: adding docbug patch with slight ammendments
+    // 'Fixes two deadlock conditions involving JmDNS.close() - ID: 1473279'
+    //
+    //---------------------------------------------------
+    /**
+     * The timer that triggers our announcements.
+     * We can't use the main timer object, because that could cause a deadlock
+     * where Prober waits on JmDNS.this lock held by close(), close()
+     * waits for us to finish, and we wait for Prober to give us back
+     * the timer thread so we can announce.
+     * (Patch from docbug in 2006-04-19 still wasn't patched .. so I'm doing it!)
+     */
+    private Timer cancelerTimer = new Timer("JmDNS.cancelerTimer");
+    //---------------------------------------------------
 
     /**
      * The timer is used to dispatch all outgoing messages of JmDNS. It is also
@@ -694,7 +710,14 @@ public class JmDNSImpl extends JmDNS
         }
 
         final Object lock = new Object();
-        new Canceler(this, list, lock).start(timer);
+        //
+        // 2009-09-16 ldeck: adding docbug patch with slight ammendments
+        // 'Fixes two deadlock conditions involving JmDNS.close() - ID: 1473279'
+        //
+        //---------------------------------------------------
+        new Canceler(this, list, lock).start(cancelerTimer);
+        //new Canceler(this, list, lock).start(timer);
+        //---------------------------------------------------
         // Remind: We get a livelock here, if the Canceler does not run!
         try
         {
@@ -1323,19 +1346,33 @@ public class JmDNSImpl extends JmDNS
         ServiceCollector collector;
 
         boolean newCollectorCreated;
-        synchronized (serviceCollectors)
+        //
+        // 2009-09-16 ldeck: adding docbug patch with slight ammendments
+        // 'Fixes two deadlock conditions involving JmDNS.close() - ID: 1473279'
+        //
+        synchronized (this) // to avoid possible deadlock with a close() in another thread
         {
-            collector = (ServiceCollector) serviceCollectors.get(type);
-            if (collector == null)
+        	// If we've been cancelled but got the lock, we're about to die anyway,
+        	// so just return an empty array.
+        	if (state == DNSState.CANCELED)
+        	{
+        		return new ServiceInfo[0];
+        	}
+        	
+        	synchronized (serviceCollectors)
             {
-                collector = new ServiceCollector(type);
-                serviceCollectors.put(type, collector);
-                addServiceListener(type, collector);
-                newCollectorCreated = true;
-            }
-            else
-            {
-                newCollectorCreated = false;
+                collector = (ServiceCollector) serviceCollectors.get(type);
+                if (collector == null)
+                {
+                    collector = new ServiceCollector(type);
+                    serviceCollectors.put(type, collector);
+                    addServiceListener(type, collector);
+                    newCollectorCreated = true;
+                }
+                else
+                {
+                    newCollectorCreated = false;
+                }
             }
         }
 
