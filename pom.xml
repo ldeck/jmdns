@@ -65,12 +65,21 @@
 	</repositories>
 
 	<build>
+		<sourceDirectory>${project.basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
 					<target>${jvm.target}</target>
 					<source>${jvm.source}</source>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifestFile>lib/jmdns.manifest</manifestFile>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
