@@ -68,14 +68,18 @@
 		<sourceDirectory>${project.basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
 				<configuration>
 					<target>${jvm.target}</target>
 					<source>${jvm.source}</source>
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3</version>
 				<configuration>
 					<archive>
 						<manifestFile>lib/jmdns.manifest</manifestFile>
@@ -85,6 +89,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.3</version>
 				<executions>
 					<execution>
 						<goals>
