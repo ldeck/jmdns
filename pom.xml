@@ -25,7 +25,8 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/ldeck/jmdns.git</connection>
-		<url>scm:git:git://github.com/ldeck/jmdns.git</url>
+		<url>http://github.com/ldeck/jmdns</url>
+		<developerConnection>scm:git:git://github.com/ldeck/jmdns.git</developerConnection>
 	</scm>
 	
 	<properties>
