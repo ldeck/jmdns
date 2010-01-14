@@ -1233,13 +1233,15 @@ public class JmDNSImpl extends JmDNS
                 // This protects against recursive calls
                 this.setState(DNSState.CANCELED);
 
-                // Stop timers
+                // Stop the timer
                 _timer.cancel();
-                _cancelerTimer.cancel();
 
                 // Cancel all services
                 this.unregisterAllServices();
                 this.disposeServiceCollectors();
+                
+                // Stop the canceler timer
+                _cancelerTimer.cancel();
 
                 // close socket
                 this.closeMulticastSocket();
